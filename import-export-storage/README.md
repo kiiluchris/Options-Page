@@ -1,0 +1,1 @@
+Options page with import/export of data from extension chrome local storage

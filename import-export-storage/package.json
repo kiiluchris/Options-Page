@@ -1,0 +1,29 @@
+{
+  "name": "import-export-storage",
+  "version": "1.0.0",
+  "description": "Options page with import/export of data from extension chrome local storage",
+  "main": "./lib/index.js",
+  "scripts": {
+    "build": "babel src -d lib"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "babel-cli": "6.26.0",
+    "babel-plugin-transform-object-rest-spread": "6.26.0",
+    "babel-preset-env": "1.6.1"
+  },
+  "directories": {
+    "lib": "lib"
+  },
+  "dependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kiiluchris/extension-kitchen-sink.git"
+  },
+  "bugs": {
+    "url": "https://github.com/kiiluchris/extension-kitchen-sink/issues"
+  },
+  "homepage": "https://github.com/kiiluchris/extension-kitchen-sink#readme"
+}

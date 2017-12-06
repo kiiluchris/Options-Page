@@ -1,4 +1,5 @@
 import {importData, exportData} from './extension';
+import {resolve} from 'path';
 
 /**
  * Setup click listeners for the options.html
@@ -20,7 +21,6 @@ export const setupOptionsListeners = ({cleanupKeys = [], filterKeys ={}}) => {
       importData({cleanupKeys, filterKeys}, false).catch(console.error);
     });
 };
-
 export default setupOptionsListeners;
-export const optionsUITemplatePath = __dirname + '../options.ejs';
+export const optionsUITemplatePath = resolve(__dirname, '../options.html');
 export {importData, exportData};

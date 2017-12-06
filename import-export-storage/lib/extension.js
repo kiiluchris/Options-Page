@@ -9,14 +9,14 @@ exports.importData = importData;
 var _mergeJson = require('./merge-json');
 
 function getStorage(key = '') {
-  return new Promise(res => {
+  return new Promise(function (res) {
     const args = key === '' ? [res] : [key, res];
     chrome.storage.local.get(...args);
   });
 }
 
 function setStorage(data) {
-  return new Promise(res => {
+  return new Promise(function (res) {
     chrome.storage.local.set(data, res);
   });
 }
@@ -29,7 +29,7 @@ function setStorage(data) {
  * @returns 
  */
 async function exportData(key = '') {
-  return new Promise(async resolve => {
+  return new Promise(async function (resolve) {
     const data = await getStorage(key);
     const blob = new Blob([JSON.stringify(data, null, '\t')], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
@@ -50,7 +50,7 @@ async function exportData(key = '') {
  * @returns 
  */
 async function importData({ cleanupKeys = [], filterKeys = {} }, isReplacingData = true) {
-  return new Promise(async resolve => {
+  return new Promise(async function (resolve) {
     const el = document.createElement('input');
     el.setAttribute('type', 'file');
     el.setAttribute('accept', '.json');
@@ -59,7 +59,7 @@ async function importData({ cleanupKeys = [], filterKeys = {} }, isReplacingData
       if (this.files.length) {
         const reader = new FileReader();
         reader.addEventListener('load', function () {
-          return (async res => {
+          return async function (res) {
             const data = (0, _mergeJson.cleanData)(res, cleanupKeys);
             if (isReplacingData) {
               await setStorage(data);
@@ -67,7 +67,7 @@ async function importData({ cleanupKeys = [], filterKeys = {} }, isReplacingData
               const dataInStorage = await getStorage();
               await setStorage((0, _mergeJson.mergeJSONObjects)(filterKeys)(data, dataInStorage));
             }
-          })(this.result).then(resolve).catch(console.error);
+          }(this.result).then(resolve).catch(console.error);
         });
         reader.readAsText(this.files[0]);
       }

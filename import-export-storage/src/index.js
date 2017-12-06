@@ -1,6 +1,12 @@
 import {importData, exportData} from './extension';
 
-export const setupOptionsListeners = ({cleanupKeys, filterKeys}) => {
+/**
+ * Setup click listeners for the options.html
+ * 
+ * @export
+ * @param {object} {cleanupKeys, filterKeys} Array of keys to be retained at the root of data, Object mapping object keys of arrays to keys by which contents are filtered
+ */
+export const setupOptionsListeners = ({cleanupKeys = [], filterKeys ={}}) => {
   document.querySelector('main button#import')
     .addEventListener('click', () => {
       importData({cleanupKeys, filterKeys}).catch(console.error);

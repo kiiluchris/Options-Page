@@ -1,4 +1,4 @@
-import { mergeJSONObjects } from "./merge-json";
+import { mergeJSONObjects, cleanData } from "./merge-json";
 
 function getStorage(key=''){
   return new Promise(res => {
@@ -13,6 +13,13 @@ function setStorage(data){
   })
 }
 
+/**
+ * Download local extension storage as json file
+ * 
+ * @export
+ * @param {string} [key=''] Root keys being downloaded
+ * @returns 
+ */
 export async function exportData(key=''){
   return new Promise(async resolve => {
     const data = await getStorage(key);
@@ -29,18 +36,14 @@ export async function exportData(key=''){
   }).then(window.close);
 }
 
-function cleanData(fileContents, keys = []){
-  const src = JSON.parse(fileContents);
-  let parsedData = {};
-  for(const k of keys){
-    if(src.hasOwnProperty(k)){
-      parsedData[k] = src[k];
-    }
-  }
-
-  return parsedData;
-}
-
+/**
+ * Insert data into extension local storage from .json file
+ * 
+ * @export
+ * @param {object} {cleanupKeys=[], filterKeys={}} Array of keys to be retained at the root of data, Object mapping object keys of arrays to keys by which contents are filtered
+ * @param {boolean} [isReplacingData=true] Check whether wiping out existing data
+ * @returns 
+ */
 export async function importData({cleanupKeys=[], filterKeys={}}, isReplacingData = true){
   return new Promise(async resolve => {
     const el = document.createElement('input');

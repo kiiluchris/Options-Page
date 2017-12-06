@@ -21,6 +21,13 @@ function setStorage(data) {
   });
 }
 
+/**
+ * Download local extension storage as json file
+ * 
+ * @export
+ * @param {string} [key=''] Root keys being downloaded
+ * @returns 
+ */
 async function exportData(key = '') {
   return new Promise(async resolve => {
     const data = await getStorage(key);
@@ -34,18 +41,14 @@ async function exportData(key = '') {
   }).then(window.close);
 }
 
-function cleanData(fileContents, keys = []) {
-  const src = JSON.parse(fileContents);
-  let parsedData = {};
-  for (const k of keys) {
-    if (src.hasOwnProperty(k)) {
-      parsedData[k] = src[k];
-    }
-  }
-
-  return parsedData;
-}
-
+/**
+ * Insert data into extension local storage from .json file
+ * 
+ * @export
+ * @param {object} {cleanupKeys=[], filterKeys={}} Array of keys to be retained at the root of data, Object mapping object keys of arrays to keys by which contents are filtered
+ * @param {boolean} [isReplacingData=true] Check whether wiping out existing data
+ * @returns 
+ */
 async function importData({ cleanupKeys = [], filterKeys = {} }, isReplacingData = true) {
   return new Promise(async resolve => {
     const el = document.createElement('input');
@@ -57,7 +60,7 @@ async function importData({ cleanupKeys = [], filterKeys = {} }, isReplacingData
         const reader = new FileReader();
         reader.addEventListener('load', function () {
           return (async res => {
-            const data = cleanData(res, cleanupKeys);
+            const data = (0, _mergeJson.cleanData)(res, cleanupKeys);
             if (isReplacingData) {
               await setStorage(data);
             } else {

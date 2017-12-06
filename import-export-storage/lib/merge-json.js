@@ -3,12 +3,47 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.cleanData = cleanData;
 exports.mergeJSONObjects = mergeJSONObjects;
 exports.mergeArrays = mergeArrays;
+/**
+ * Check two values are of the same type
+ * 
+ * @param {any} obj 
+ * @param {any} obj2 
+ * @returns 
+ */
 function haveSameType(obj, obj2) {
   return typeof obj === typeof obj2;
 }
 
+/**
+ * Filter object to get only necessary keys values
+ * 
+ * @export
+ * @param {any} [jsonString='{}'] JSON formatted string
+ * @param {any} [keys=[]] Object keys which are to be returned
+ * @returns 
+ */
+function cleanData(jsonString = '{}', keys = []) {
+  const src = JSON.parse(jsonString);
+  let parsedData = {};
+  for (const k of keys) {
+    if (src.hasOwnProperty(k)) {
+      parsedData[k] = src[k];
+    }
+  }
+
+  return parsedData;
+}
+
+/**
+ * Deeply Merges two JSON objects 
+ * 
+ * @export
+ * @param {object} [filterKeys={}] An object mapping an object containing an array to the key by which it is filtered
+ * @returns 
+ */
 function mergeJSONObjects(filterKeys = {}) {
   return (data, old) => {
     const result = { ...old };
@@ -30,6 +65,12 @@ function mergeJSONObjects(filterKeys = {}) {
   };
 }
 
+/**
+ * Check if item key of item is the same as an item in the array
+ * 
+ * @param {object} {_key, key, item, arr} Object key, Key by which items are filtered, Item being searched for, Array
+ * @returns 
+ */
 function checkItemInArray({ _key, key, item, arr }) {
   let index;
   for (const subItem of item[_key]) {
@@ -50,6 +91,14 @@ function checkItemInArray({ _key, key, item, arr }) {
   };
 }
 
+/**
+ * Deeply merge two arrays
+ * 
+ * @export
+ * @param {string} [_key=''] Key of an object containing an array
+ * @param {object} [filterKeys={}] Object containing the mapping key of the object in an array to the keys by which they are filtered
+ * @returns 
+ */
 function mergeArrays(_key = '', filterKeys = {}) {
   const key = filterKeys[_key];
 

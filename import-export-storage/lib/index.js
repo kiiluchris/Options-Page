@@ -7,7 +7,13 @@ exports.exportData = exports.importData = exports.optionsUITemplatePath = export
 
 var _extension = require('./extension');
 
-const setupOptionsListeners = exports.setupOptionsListeners = ({ cleanupKeys, filterKeys }) => {
+/**
+ * Setup click listeners for the options.html
+ * 
+ * @export
+ * @param {object} {cleanupKeys, filterKeys} Array of keys to be retained at the root of data, Object mapping object keys of arrays to keys by which contents are filtered
+ */
+const setupOptionsListeners = exports.setupOptionsListeners = ({ cleanupKeys = [], filterKeys = {} }) => {
   document.querySelector('main button#import').addEventListener('click', () => {
     (0, _extension.importData)({ cleanupKeys, filterKeys }).catch(console.error);
   });

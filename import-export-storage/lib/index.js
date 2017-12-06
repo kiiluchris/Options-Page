@@ -3,26 +3,23 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.exportData = exports.importData = exports.templatePath = undefined;
+exports.exportData = exports.importData = exports.optionsUITemplatePath = exports.setupOptionsListeners = undefined;
 
 var _extension = require('./extension');
 
-var setupOptionsListeners = function setupOptionsListeners(_ref) {
-  var cleanupKeys = _ref.cleanupKeys,
-      filterKeys = _ref.filterKeys;
-
-  document.querySelector('main button#import').addEventListener('click', function () {
-    (0, _extension.importData)({ cleanupKeys: cleanupKeys, filterKeys: filterKeys }).catch(console.error);
+const setupOptionsListeners = exports.setupOptionsListeners = ({ cleanupKeys, filterKeys }) => {
+  document.querySelector('main button#import').addEventListener('click', () => {
+    (0, _extension.importData)({ cleanupKeys, filterKeys }).catch(console.error);
   });
-  document.querySelector('main button#export').addEventListener('click', function () {
+  document.querySelector('main button#export').addEventListener('click', () => {
     (0, _extension.exportData)().catch(console.error);
   });
-  document.querySelector('main button#merge').addEventListener('click', function () {
-    (0, _extension.importData)({ cleanupKeys: cleanupKeys, filterKeys: filterKeys }, false).catch(console.error);
+  document.querySelector('main button#merge').addEventListener('click', () => {
+    (0, _extension.importData)({ cleanupKeys, filterKeys }, false).catch(console.error);
   });
 };
 
 exports.default = setupOptionsListeners;
-var templatePath = exports.templatePath = __dirname + '../options.ejs';
+const optionsUITemplatePath = exports.optionsUITemplatePath = __dirname + '../options.ejs';
 exports.importData = _extension.importData;
 exports.exportData = _extension.exportData;

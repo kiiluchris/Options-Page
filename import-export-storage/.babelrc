@@ -1,9 +1,13 @@
 {
-  "presets": [
-    "env"
-  ],
+  "presets": [[
+    "env", {
+      "targets": {
+        "node": "8.9.2"
+      }
+    }
+  ]],
   "plugins": [
     "syntax-async-functions",
-    "transform-object-rest-spread"
+    "syntax-object-rest-spread"
   ]
 }

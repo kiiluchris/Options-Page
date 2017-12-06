@@ -1,6 +1,6 @@
 import {importData, exportData} from './extension';
 
-const setupOptionsListeners = ({cleanupKeys, filterKeys}) => {
+export const setupOptionsListeners = ({cleanupKeys, filterKeys}) => {
   document.querySelector('main button#import')
     .addEventListener('click', () => {
       importData({cleanupKeys, filterKeys}).catch(console.error);
@@ -16,5 +16,5 @@ const setupOptionsListeners = ({cleanupKeys, filterKeys}) => {
 };
 
 export default setupOptionsListeners;
-export const templatePath = __dirname + '../options.ejs';
+export const optionsUITemplatePath = __dirname + '../options.ejs';
 export {importData, exportData};

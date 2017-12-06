@@ -16,5 +16,6 @@
     "url": "https://github.com/kiiluchris/extension-kitchen-sink/issues"
   },
   "homepage": "https://github.com/kiiluchris/extension-kitchen-sink#readme",
-  "description": ""
+  "description": "",
+  "devDependencies": {}
 }

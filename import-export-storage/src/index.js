@@ -21,6 +21,5 @@ export const setupOptionsListeners = ({cleanupKeys = [], filterKeys ={}}) => {
       importData({cleanupKeys, filterKeys}, false).catch(console.error);
     });
 };
-export default setupOptionsListeners;
 export const optionsUITemplatePath = resolve(__dirname, '../options.html');
 export {importData, exportData};

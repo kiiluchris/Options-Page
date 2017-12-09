@@ -26,7 +26,6 @@ const setupOptionsListeners = exports.setupOptionsListeners = function ({ cleanu
     (0, _extension.importData)({ cleanupKeys, filterKeys }, false).catch(console.error);
   });
 };
-exports.default = setupOptionsListeners;
 const optionsUITemplatePath = exports.optionsUITemplatePath = (0, _path.resolve)(__dirname, '../options.html');
 exports.importData = _extension.importData;
 exports.exportData = _extension.exportData;

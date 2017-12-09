@@ -4,7 +4,10 @@
   "description": "Options page with import/export of data from extension chrome local storage",
   "main": "./lib/index.js",
   "scripts": {
-    "build": "babel src -d lib"
+    "build": "babel src -d lib",
+    "watch": "babel src -d lib -w",
+    "compile": "rollup --config rollup.config.js",
+    "test": "mocha tests/**/**.spec.js"
   },
   "keywords": [],
   "author": "",
@@ -13,12 +16,19 @@
     "babel-cli": "6.26.0",
     "babel-plugin-syntax-async-functions": "6.13.0",
     "babel-plugin-transform-object-rest-spread": "6.26.0",
-    "babel-preset-env": "1.6.1"
+    "babel-preset-env": "1.6.1",
+    "chai": "4.1.2",
+    "mocha": "4.0.1",
+    "rollup": "0.52.1",
+    "rollup-plugin-babel": "3.0.2"
   },
   "directories": {
     "lib": "lib"
   },
   "dependencies": {},
+  "engines": {
+    "node": ">=8.9.2"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/kiiluchris/extension-kitchen-sink.git"

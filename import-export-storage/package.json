@@ -6,7 +6,7 @@
   "scripts": {
     "build": "babel src -d lib",
     "watch": "babel src -d lib -w",
-    "compile": "rollup --config rollup.config.js",
+    "bundle": "rollup --config rollup.config.js",
     "test": "mocha tests/**/**.spec.js"
   },
   "keywords": [],

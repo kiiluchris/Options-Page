@@ -17,13 +17,13 @@ var _path = require('path');
  */
 const setupOptionsListeners = exports.setupOptionsListeners = function ({ cleanupKeys = [], filterKeys = {} }) {
   document.querySelector('main button#import').addEventListener('click', function () {
-    (0, _extension.importData)({ cleanupKeys, filterKeys }).catch(console.error);
+    (0, _extension.importData)({ cleanupKeys, filterKeys }).then(window.close).catch(console.error);
   });
   document.querySelector('main button#export').addEventListener('click', function () {
-    (0, _extension.exportData)().catch(console.error);
+    (0, _extension.exportData)().then(window.close).catch(console.error);
   });
   document.querySelector('main button#merge').addEventListener('click', function () {
-    (0, _extension.importData)({ cleanupKeys, filterKeys }, false).catch(console.error);
+    (0, _extension.importData)({ cleanupKeys, filterKeys }, false).then(window.close).catch(console.error);
   });
 };
 const optionsUITemplatePath = exports.optionsUITemplatePath = (0, _path.resolve)(__dirname, '../options.html');

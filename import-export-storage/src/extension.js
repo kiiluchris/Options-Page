@@ -33,7 +33,7 @@ export async function exportData(key=''){
     el.setAttribute('download', 'data.json');
     el.addEventListener('click', resolve);
     el.click();
-  }).then(window.close);
+  });
 }
 
 /**
@@ -67,5 +67,5 @@ export async function importData({cleanupKeys=[], filterKeys={}}, isReplacingDat
         reader.readAsText(this.files[0]);
       }
     });
-  }).then(window.close);
+  });
 }

@@ -10,15 +10,15 @@ import {resolve} from 'path';
 export const setupOptionsListeners = ({cleanupKeys = [], filterKeys ={}}) => {
   document.querySelector('main button#import')
     .addEventListener('click', () => {
-      importData({cleanupKeys, filterKeys}).catch(console.error);
+      importData({cleanupKeys, filterKeys}).then(window.close).catch(console.error);
     });
   document.querySelector('main button#export')
     .addEventListener('click', () => {
-      exportData().catch(console.error);
+      exportData().then(window.close).catch(console.error);
     });
   document.querySelector('main button#merge')
     .addEventListener('click', () => {
-      importData({cleanupKeys, filterKeys}, false).catch(console.error);
+      importData({cleanupKeys, filterKeys}, false).then(window.close).catch(console.error);
     });
 };
 export const optionsUITemplatePath = resolve(__dirname, '../options.html');

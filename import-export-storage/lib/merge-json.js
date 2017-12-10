@@ -9,6 +9,7 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 exports.cleanData = cleanData;
 exports.mergeJSONObjects = mergeJSONObjects;
 exports.mergeArrays = mergeArrays;
+exports.mergeOrReplaceVariable = mergeOrReplaceVariable;
 /**
  * Check two values are of the same type
  * 
@@ -24,8 +25,8 @@ function haveSameType(obj, obj2) {
  * Filter object to get only necessary keys values
  * 
  * @export
- * @param {any} [jsonString='{}'] JSON formatted string
- * @param {any} [keys=[]] Object keys which are to be returned
+ * @param {string} [jsonString='{}'] JSON formatted string
+ * @param {string[]} [keys=[]] Object keys which are to be returned
  * @returns 
  */
 function cleanData(jsonString = '{}', keys = []) {
@@ -49,11 +50,14 @@ function cleanData(jsonString = '{}', keys = []) {
  */
 function mergeJSONObjects(filterKeys = {}) {
   return function (old = {}, data = {}) {
+    if (!(old.constructor === Object && data.constructor === Object)) {
+      return data;
+    }
     const result = _extends({}, old);
     const keys = Object.keys(data);
     for (const key of keys) {
       const currentNew = data[key];
-      result[key] = result.hasOwnProperty(key) ? mergeOrReplaceVariable(key, filterKeys)(result[key], currentNew) : currentNew;
+      result[key] = result.hasOwnProperty(key) ? mergeOrReplaceVariable({ key, filterKeys })(result[key], currentNew) : currentNew;
     }
 
     return result;
@@ -100,6 +104,9 @@ function mergeArrays(_key = '', filterKeys = {}) {
   const key = filterKeys[_key];
 
   return function (old = [], arr = []) {
+    if (!(Array.isArray(old) && Array.isArray(arr))) {
+      return arr;
+    }
     const result = old.slice();
     for (let i = 0; i < arr.length; i++) {
       const item = arr[i];
@@ -131,7 +138,7 @@ function mergeArrays(_key = '', filterKeys = {}) {
             }
           }
         } else {
-          result[i] = mergeOrReplaceVariable(key, _extends({ [key]: key }, filterKeys))(result[i], item);
+          result[i] = mergeOrReplaceVariable({ key, filterKeys: _extends({ [key]: key }, filterKeys) })(result[i], item);
           hasChanged = true;
         }
       }
@@ -145,12 +152,12 @@ function mergeArrays(_key = '', filterKeys = {}) {
   };
 }
 
-function mergeOrReplaceVariable(key, filterKeys) {
+function mergeOrReplaceVariable({ key = '', filterKeys = {} } = {}) {
   return function (oldVal, newVal) {
-    if (typeof newVal === 'object' && typeof oldVal === 'object') {
-      const appendFunc = Array.isArray(newVal) && Array.isArray(oldVal) ? mergeArrays(key, filterKeys) : mergeJSONObjects(filterKeys);
-
-      return appendFunc(oldVal, newVal);
+    if (Array.isArray(newVal) && Array.isArray(oldVal)) {
+      return mergeArrays(key, filterKeys)(oldVal, newVal);
+    } else if (oldVal.constructor === Object && newVal.constructor === Object) {
+      return mergeJSONObjects(filterKeys)(oldVal, newVal);
     }
 
     return newVal;

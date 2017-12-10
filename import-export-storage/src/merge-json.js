@@ -14,8 +14,8 @@ function haveSameType(obj, obj2){
  * Filter object to get only necessary keys values
  * 
  * @export
- * @param {any} [jsonString='{}'] JSON formatted string
- * @param {any} [keys=[]] Object keys which are to be returned
+ * @param {string} [jsonString='{}'] JSON formatted string
+ * @param {string[]} [keys=[]] Object keys which are to be returned
  * @returns 
  */
 export function cleanData(jsonString='{}', keys = []){
@@ -39,12 +39,15 @@ export function cleanData(jsonString='{}', keys = []){
  */
 export function mergeJSONObjects(filterKeys={}){
   return (old = {}, data = {}) => {
+    if(!(old.constructor === Object && data.constructor === Object)){
+      return data;
+    }
     const result = {...old};
     const keys = Object.keys(data);
     for(const key of keys){
       const currentNew = data[key];
       result[key] = result.hasOwnProperty(key) ?
-        mergeOrReplaceVariable(key, filterKeys)(
+        mergeOrReplaceVariable({key, filterKeys})(
           result[key], currentNew
         ) : currentNew;
     }
@@ -93,7 +96,10 @@ function checkItemInArray({_key, key, item, arr}){
 export function mergeArrays(_key = '', filterKeys ={}){
   const key = filterKeys[_key];
 
-  return (old = [], arr = []) => {
+  return (old = [], arr = []) => {    
+    if(!(Array.isArray(old) && Array.isArray(arr))){
+      return arr;
+    }
     const result = old.slice();
     for(let i = 0; i < arr.length; i++){
       const item = arr[i];
@@ -132,7 +138,7 @@ export function mergeArrays(_key = '', filterKeys ={}){
             }
           }
         } else {
-          result[i] = mergeOrReplaceVariable(key, {[key]:key, ...filterKeys})(
+          result[i] = mergeOrReplaceVariable({key, filterKeys:{[key]:key, ...filterKeys}})(
             result[i], item
           );
           hasChanged = true;
@@ -148,13 +154,12 @@ export function mergeArrays(_key = '', filterKeys ={}){
   };
 }
 
-function mergeOrReplaceVariable(key, filterKeys){
+export function mergeOrReplaceVariable({key = '', filterKeys = {}} = {}){
   return (oldVal, newVal) => {
-    if(typeof newVal === 'object' && typeof oldVal === 'object'){
-      const appendFunc = (Array.isArray(newVal) && Array.isArray(oldVal)) ? 
-        mergeArrays(key, filterKeys) : mergeJSONObjects(filterKeys);
-
-      return appendFunc(oldVal, newVal);
+    if(Array.isArray(newVal) && Array.isArray(oldVal)){
+      return mergeArrays(key, filterKeys)(oldVal, newVal);
+    } else if(oldVal.constructor === Object && newVal.constructor === Object){
+      return mergeJSONObjects(filterKeys)(oldVal, newVal);
     }
     
     return newVal;

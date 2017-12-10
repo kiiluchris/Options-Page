@@ -48,39 +48,37 @@ function cleanData(jsonString = '{}', keys = []) {
  * @param {object} [filterKeys={}] An object mapping an object containing an array to the key by which it is filtered
  * @returns 
  */
-function mergeJSONObjects(filterKeys = {}) {
-  return function (old = {}, data = {}) {
-    if (!(old.constructor === Object && data.constructor === Object)) {
-      return data;
-    }
-    const result = _extends({}, old);
-    const keys = Object.keys(data);
-    for (const key of keys) {
-      const currentNew = data[key];
-      result[key] = result.hasOwnProperty(key) ? mergeOrReplaceVariable({ key, filterKeys })(result[key], currentNew) : currentNew;
-    }
+function mergeJSONObjects(old = {}, data = {}, { filterKeys = {} } = {}) {
+  if (!(old.constructor === Object && data.constructor === Object)) {
+    return data;
+  }
+  const result = _extends({}, old);
+  const keys = Object.keys(data);
+  for (const key of keys) {
+    const currentNew = data[key];
+    result[key] = result.hasOwnProperty(key) ? mergeOrReplaceVariable(result[key], currentNew, { key, filterKeys }) : currentNew;
+  }
 
-    return result;
-  };
+  return result;
 }
 
 /**
  * Check if item key of item is the same as an item in the array
  * 
- * @param {object} {_key, key, item, arr} Object key, Key by which items are filtered, Item being searched for, Array
+ * @param {object} {itemKey, subItemKey, item, arr} Object key, Key by which items are filtered, Item being searched for, Array
  * @returns 
  */
-function checkItemInArray({ _key, key, item, arr }) {
+function checkItemInArray({ key = '', subKey = '', item = [], arr = [] }) {
   let index;
-  for (const subItem of item[_key]) {
+  for (const subItem of item[key]) {
     for (let subIndex = 0; subIndex < arr.length; subIndex++) {
-      const subArr = arr[subIndex];
-      if (Array.isArray(subArr[_key]) && ~(index = subArr[_key].findIndex(function (_r) {
-        return _r[key] === subItem[key];
+      const oldItem = arr[subIndex];
+      if (Array.isArray(oldItem[key]) && ~(index = oldItem[key].findIndex(function (_r) {
+        return _r[subKey] === subItem[subKey];
       }))) {
         return {
           isInArray: true,
-          subArr,
+          oldItem,
           subIndex
         };
       }
@@ -96,70 +94,74 @@ function checkItemInArray({ _key, key, item, arr }) {
  * Deeply merge two arrays
  * 
  * @export
- * @param {string} [_key=''] Key of an object containing an array
+ * @param {string} [key=''] Key of an object containing an array
  * @param {object} [filterKeys={}] Object containing the mapping key of the object in an array to the keys by which they are filtered
  * @returns 
  */
-function mergeArrays(_key = '', filterKeys = {}) {
-  const key = filterKeys[_key];
-
-  return function (old = [], arr = []) {
-    if (!(Array.isArray(old) && Array.isArray(arr))) {
-      return arr;
-    }
-    const result = old.slice();
-    for (let i = 0; i < arr.length; i++) {
-      const item = arr[i];
-      let hasChanged = false;
-      if (typeof item === 'object' && typeof result[i] === 'object') {
-        let index;
-        if (!Array.isArray(item) && key !== undefined) {
-          if (item[_key] !== undefined && item[_key][key] !== undefined && ~(index = result.findIndex(function (r) {
-            return r[_key][key] === item[_key][key];
-          }))) {
-            result[index] = mergeJSONObjects(filterKeys)(result[index], item);
-            hasChanged = true;
-          } else if (item[key] !== undefined && ~(index = result.findIndex(function (r) {
-            return r[key] === item[key];
-          }))) {
-            result[index] = mergeJSONObjects(filterKeys)(result[index], item);
-            hasChanged = true;
-          } else if (item[_key] !== undefined && Array.isArray(item[_key])) {
-            const { isInArray, subArr, subIndex } = checkItemInArray({ _key, key, item, arr: result });
-            if (isInArray) {
-              const itemVal = item[_key].slice();
-              delete item[_key];
-              const subResult = subArr[_key].slice();
-              delete subArr[_key];
-              const obj = mergeJSONObjects(filterKeys)(subArr, item);
-              obj[_key] = mergeArrays(key, _extends({ [key]: key }, filterKeys))(subResult, itemVal);
-              result[subIndex] = obj;
-              hasChanged = true;
-            }
-          }
-        } else {
-          result[i] = mergeOrReplaceVariable({ key, filterKeys: _extends({ [key]: key }, filterKeys) })(result[i], item);
+function mergeArrays(old = [], arr = [], { key = '', filterKeys = {} } = {}) {
+  if (!(Array.isArray(old) && Array.isArray(arr))) {
+    return arr;
+  }
+  const subKey = filterKeys[key];
+  const result = old.slice();
+  for (let i = 0; i < arr.length; i++) {
+    const item = arr[i];
+    let hasChanged = false;
+    if (typeof item === 'object' && typeof result[i] === 'object') {
+      let index;
+      if (!Array.isArray(item) && subKey !== undefined) {
+        if (item[key] !== undefined && item[key][subKey] !== undefined && ~(index = result.findIndex(function (r) {
+          return r[key][subKey] === item[key][subKey];
+        })) || item[subKey] !== undefined && ~(index = result.findIndex(function (r) {
+          return r[subKey] === item[subKey];
+        }))) {
+          result[index] = mergeOrReplaceVariable(result[index], item, { filterKeys });
           hasChanged = true;
+        } else if (Array.isArray(item[key])) {
+          const { isInArray, oldItem, subIndex } = checkItemInArray({
+            subKey, key, item, arr: result
+          });
+          if (isInArray) {
+            const itemArr = item[key].slice();
+            const oldItemArr = oldItem[key].slice();
+            delete item[key];
+            delete oldItem[key];
+            const obj = mergeOrReplaceVariable(oldItem, item, { filterKeys });
+            obj[key] = mergeOrReplaceVariable(oldItemArr, itemArr, {
+              key: subKey, filterKeys: _extends({ [subKey]: subKey }, filterKeys)
+            });
+            result[subIndex] = obj;
+            hasChanged = true;
+          }
         }
-      }
-
-      if (!hasChanged && !result.includes(item)) {
-        result.push(item);
+      } else {
+        result[i] = mergeOrReplaceVariable(result[i], item, {
+          key: subKey, filterKeys: _extends({ [subKey]: subKey }, filterKeys)
+        });
+        hasChanged = true;
       }
     }
 
-    return result;
-  };
-}
-
-function mergeOrReplaceVariable({ key = '', filterKeys = {} } = {}) {
-  return function (oldVal, newVal) {
-    if (Array.isArray(newVal) && Array.isArray(oldVal)) {
-      return mergeArrays(key, filterKeys)(oldVal, newVal);
-    } else if (oldVal.constructor === Object && newVal.constructor === Object) {
-      return mergeJSONObjects(filterKeys)(oldVal, newVal);
+    if (!hasChanged && !result.includes(item)) {
+      result.push(item);
     }
+  }
 
-    return newVal;
-  };
+  return result;
 }
+
+function mergeOrReplaceVariable(oldVal, newVal, { key = '', filterKeys = {} } = {}) {
+  if (Array.isArray(newVal) && Array.isArray(oldVal)) {
+    return mergeArrays(oldVal, newVal, { key, filterKeys });
+  } else if (oldVal.constructor === Object && newVal.constructor === Object) {
+    return mergeJSONObjects(oldVal, newVal, { filterKeys });
+  }
+
+  return newVal;
+}
+
+mergeOrReplaceVariable.all = function (arr = [], options = {}) {
+  return arr.reduce(function (prev, next) {
+    return mergeOrReplaceVariable(prev, next, options);
+  }, {});
+};

@@ -31,7 +31,9 @@ export async function exportData(key=''){
     const el = document.createElement('a');
     el.setAttribute('href', url);
     el.setAttribute('download', 'data.json');
-    el.addEventListener('click', resolve);
+    el.addEventListener('click', _ => 
+      setTimeout(resolve, 1000)
+    );
     el.click();
   });
 }
